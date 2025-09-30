@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "dgSpecHash": "bhZ0JksHec0=",
+  "success": true,
+  "projectFilePath": "/home/astrochat/Desktop/livegame/JuegoVida/JuegoVida.csproj",
+  "expectedPackageFiles": [
+    "/home/astrochat/.nuget/packages/opentk/4.7.6/opentk.4.7.6.nupkg.sha512",
+    "/home/astrochat/.nuget/packages/opentk.compute/4.7.6/opentk.compute.4.7.6.nupkg.sha512",
+    "/home/astrochat/.nuget/packages/opentk.core/4.7.6/opentk.core.4.7.6.nupkg.sha512",
+    "/home/astrochat/.nuget/packages/opentk.graphics/4.7.6/opentk.graphics.4.7.6.nupkg.sha512",
+    "/home/astrochat/.nuget/packages/opentk.input/4.7.6/opentk.input.4.7.6.nupkg.sha512",
+    "/home/astrochat/.nuget/packages/opentk.mathematics/4.7.6/opentk.mathematics.4.7.6.nupkg.sha512",
+    "/home/astrochat/.nuget/packages/opentk.openal/4.7.6/opentk.openal.4.7.6.nupkg.sha512",
+    "/home/astrochat/.nuget/packages/opentk.redist.glfw/3.3.8.30/opentk.redist.glfw.3.3.8.30.nupkg.sha512",
+    "/home/astrochat/.nuget/packages/opentk.windowing.common/4.7.6/opentk.windowing.common.4.7.6.nupkg.sha512",
+    "/home/astrochat/.nuget/packages/opentk.windowing.desktop/4.7.6/opentk.windowing.desktop.4.7.6.nupkg.sha512",
+    "/home/astrochat/.nuget/packages/opentk.windowing.graphicslibraryframework/4.7.6/opentk.windowing.graphicslibraryframework.4.7.6.nupkg.sha512",
+    "/home/astrochat/.nuget/packages/system.runtime.compilerservices.unsafe/5.0.0/system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512",
+    "/home/astrochat/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.9/microsoft.aspnetcore.app.ref.9.0.9.nupkg.sha512"
+  ],
+  "logs": []
+}
