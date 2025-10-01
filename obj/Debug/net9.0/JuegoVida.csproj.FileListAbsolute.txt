@@ -28,3 +28,4 @@
 /home/astrochat/Desktop/livegame/JuegoVida/obj/Debug/net9.0/JuegoVida.csproj.Up2Date
 /home/astrochat/Desktop/livegame/JuegoVida/bin/Debug/net9.0/OpenTK.OpenAL.dll
 /home/astrochat/Desktop/livegame/JuegoVida/bin/Debug/net9.0/runtimes/linux-x64/native/libglfw.so.3.3
+/home/astrochat/Desktop/livegame/JuegoVida/obj/Debug/net9.0/JuegoVida.sourcelink.json

@@ -58,7 +58,7 @@ class Window : GameWindow
         string fragmentShaderSrc = @"
         #version 330 core
         out vec4 FragColor;
-	uniform vec3 uColor:
+	uniform vec3 uColor;
         void main()
         {
             FragColor = vec4(uColor, 1.0); 
@@ -98,28 +98,24 @@ class Window : GameWindow
         float scaleX = 0.02f;
         float scaleY = 0.03f; 
   
-        float spacing = scaleX * 2.0f;
+        float spacing = scaleX * 1.0f;
   
         for(int y = 0; y < 50; y++)
         {
           for(int x = 0; x < 50; x++)
   	{
            var transform = Matrix4.CreateScale(scaleX, scaleY, 1.0f) * Matrix4.CreateTranslation(posX, posY, 0.0f);
-           GL.UniformMatrix4(transformLoc, false, ref transform);
-  	 GL.Uniform3(_shaderProgram,0.0, 0.0, 0.0);
-           GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
   
-  	 string ID = x.ToString() + y.ToString();
-           Vector3 color = new Vector3(1.0f, 0.0f, 0.0f);
+           string ID = x.ToString() + y.ToString();
+           Vector3 color = new Vector3(1.0f, 1.0f, 1.0f);
            int colorLoc = GL.GetUniformLocation(_shaderProgram, "uColor");
-           Humans human = new Humans(x, y, ID, false, transform, color, colorLoc); 
+           Humans human = new Humans(x, y, ID, false, transform, transformLoc, color, colorLoc); 
   
-  	 listHumans.Add(human);
-  
-  	 posX += spacing;
+  	   listHumans.Add(human);
+           posX += spacing;
   	} 
-  	posY -= spacing;
-  	posX = -1.0f + 0.01f; 
+  	 posY -= spacing;
+  	 posX = -1.0f + 0.01f; 
         }
     }
 
@@ -130,12 +126,58 @@ class Window : GameWindow
       {
         Close(); 
       }
+
+      Vector3 colorDead = new Vector3(1.0f, 1.0f, 1.0f);
+      Vector3 colorAlive = new Vector3(0.0f, 0.0f, 0.0f);
+
+      for(int i = 0; i < listHumans.Count; i++)
+      { 
+	var human = listHumans[i];
+        int[] counts = human.changeColor(listHumans);
+
+	if (human.status == false && counts[1] == 3){//Nacimiento
+           human.status = true;
+	   human.Color = colorAlive;
+	}else if (human.status == true && counts[1] > 3) //Muerte por sobrepoblacion
+	{
+           human.status = false;
+	   human.Color = colorDead;
+	}else if (human.status == true && counts[1] < 2)//Muerte por soledad 
+ 	{
+           human.status = false;
+	   human.Color = colorDead;
+	}else if (human.status == true && counts[1] > 1 && counts[1] < 4)//Supervivencia
+	{
+           human.status = true;
+	   human.Color = colorAlive;
+	}
+      }
+
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
     { 
       base.OnRenderFrame(e);
 
+      GL.Clear(ClearBufferMask.ColorBufferBit);
+
+      GL.UseProgram(_shaderProgram);
+      GL.BindVertexArray(_vao);
+
+      foreach(var human in listHumans)
+      {
+	var transform = human.Transform;
+
+	if (human.id == "2020" || human.id == "1240" || human.id == "3030")
+	{
+          GL.UniformMatrix4(human.transformLoc, true, ref transform);
+          Vector3 colorAlive = new Vector3(0.0f, 0.0f, 0.0f);
+          GL.Uniform3(human.colorLoc, colorAlive);
+	}else{
+          GL.UniformMatrix4(human.transformLoc, false, ref transform);
+          GL.Uniform3(human.colorLoc, human.Color);}
+        GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+      }
 
     SwapBuffers();   
     }

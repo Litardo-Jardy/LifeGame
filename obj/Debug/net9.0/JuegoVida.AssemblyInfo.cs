@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("JuegoVida")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0ffeb8e8d692428762fdc085759f3604cd0bbc40")]
 [assembly: System.Reflection.AssemblyProductAttribute("JuegoVida")]
 [assembly: System.Reflection.AssemblyTitleAttribute("JuegoVida")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
