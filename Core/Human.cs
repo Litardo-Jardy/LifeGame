@@ -1,5 +1,8 @@
+
 using OpenTK.Mathematics;
 
+namespace MyGame.Model
+{
 class Humans
 {
   public int posX {get; set;}
@@ -26,6 +29,9 @@ class Humans
 
   public int[] changeColor(List<Humans> humans)
   {
+
+   int[] index = new int[8];
+
    var countDeads = 0;
    var countAlives = 0;
 
@@ -33,50 +39,71 @@ class Humans
 
    //Left
    ids.Add((posX - 1).ToString() + (posY - 1).ToString());
+   index[0] = _filterIndex((posX - 1), (posY -1));
+
    ids.Add((posX - 1).ToString() + posY.ToString());
+   index[1] = _filterIndex((posX - 1), posY);
+
    ids.Add((posX - 1).ToString() + (posY + 1).ToString());
+   index[2] = _filterIndex((posX - 1), (posY + 1));
 
    //Top
    ids.Add((posX - 1).ToString() + (posY - 1).ToString());
+
    ids.Add(posX.ToString() + (posY - 1).ToString());
+   index[3] = _filterIndex(posX, (posY - 1));
+   
    ids.Add((posX + 1).ToString() + (posY - 1).ToString());
 
    //Right
    ids.Add((posX + 1).ToString() + (posY - 1).ToString());
+   index[4] = _filterIndex((posX + 1), (posY - 1));
+
    ids.Add((posX + 1).ToString() + posY.ToString());
+   index[5] = _filterIndex((posX + 1), posY);
+
    ids.Add((posX + 1).ToString() + (posY + 1).ToString());
+   index[6] = _filterIndex((posX + 1), (posY + 1));
 
    //Bottom
    ids.Add((posX - 1).ToString() + (posY + 1).ToString());
+
    ids.Add(posX.ToString() + (posY + 1).ToString());
+   index[7] = _filterIndex(posX, (posY + 1));
+
    ids.Add((posX + 1).ToString() + (posY + 1).ToString());
 
-
-   foreach(var human in humans)
+   for(int i = 0; i < index.Count(); i++)
    {
-     if (ids.Count == 0)
-     {
-       break;
-     }
-     for(int i = 0; i < ids.Count; i++)
-     {
-       if (human.id == ids[i])
-       {
-          if (human.status) 
-	  {
-           countAlives += 1; 
-	  }else {
-           countDeads += 1;}
-	  ids.Remove(ids[i]);
-	  break;
+     var position = index[i];
+       if (position >= 0 && position < 10000 ) {
+         var human = humans[index[i]];
+         if (human.status) 
+	   { 
+	     countAlives += 1; 
+	   }else {
+             countDeads += 1;
+	   }
        }
-
-     }
    }
 
-   return [countDeads, countAlives];
+
+          return [countDeads, countAlives];
+
 
   }
-
+ 
+  private int _filterIndex(int newPosX, int newPosY)
+   {
+    if ((newPosX >= 0 && newPosX <= 100) && (newPosY >= 0 && newPosY <= 100))  
+    {
+      int pY = newPosY * 100;
+      int index = pY + newPosX;
+      return index;
+    }else{
+      return -1;
+    }
+   }
+ }
 }
 

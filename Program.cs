@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.Common;
 using OpenTK.Mathematics;
+
+using MyGame.Core;
 
 class Program {
    static void Main(string[] args) 
