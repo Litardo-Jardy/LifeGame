@@ -1,11 +1,8 @@
-
-
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using System;
 
 using MyGame.Model;
 
@@ -14,10 +11,11 @@ using MyGame.Model;
 //El VAO → contiene instrucciones de cómo la GPU debe leer esos vértices.
 
 namespace MyGame.Core 
-{
+ {
   class Window : GameWindow
-   {
-   
+   { 
+     private double tickRate = 0.3;
+     private double timer = 0.0;
      private int _vao;
      private int _vbo;
      private int _shaderProgram;
@@ -28,10 +26,10 @@ namespace MyGame.Core
      { }
 
      protected override void OnLoad()
-     { 
-       base.OnLoad();
-       GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
+      { 
+        base.OnLoad();
+        GL.ClearColor(1.0f, 1.0f, 0.1f, 1.0f);
+	
          //Inicializacion de la matriz;
          configShadders();
          GL.Clear(ClearBufferMask.ColorBufferBit);
@@ -39,144 +37,166 @@ namespace MyGame.Core
          GL.BindVertexArray(_vao);
   
          int transformLoc = GL.GetUniformLocation(_shaderProgram, "transform");
-  
-         float posX = -1.0f + 0.01f; 
+ 
+         float posX = -1.0f + 0.05f; 
          float posY = 1.0f - 0.015f; 
-  
+ 
          float scaleX = 0.02f;
          float scaleY = 0.03f; 
   
-         float spacing = scaleX * 1.0f;
+         float spacing = scaleX * 1f;
   
          for(int y = 0; y < 100; y++)
-         {
-           for(int x = 0; x < 100; x++)
-  	 {
-           var transform = Matrix4.CreateScale(scaleX, scaleY, 1.0f) * Matrix4.CreateTranslation(posX, posY, 0.0f);
-  
-           string ID = x.ToString() + y.ToString();
-           Random random = new Random();
-           bool alive = random.NextDouble() < 0.5; 
+          {
+            for(int x = 0; x < 100; x++)
+             {
+               var transform = Matrix4.CreateScale(scaleX, scaleY, 1.0f) * Matrix4.CreateTranslation(posX, posY, 0.0f);
+     
+               string ID = x.ToString() + y.ToString();
+               Random random = new Random();
+               bool alive = random.NextDouble() < 0.2; 
 
-           Vector3 color = alive 
-            ? new Vector3(0.0f, 0.0f, 0.0f) 
-            : new Vector3(1.0f, 1.0f, 1.0f);
+               Vector3 color = alive 
+                ? new Vector3(0.0f, 0.0f, 0.0f) 
+                : new Vector3(1.0f, 1.0f, 1.0f);
 
-           int colorLoc = GL.GetUniformLocation(_shaderProgram, "uColor");
-           Humans human = new Humans(x, y, ID, alive, transform, transformLoc, color, colorLoc); 
-  
-  	   listHumans.Add(human);
-           posX += spacing;
-  	} 
-  	 posY -= spacing;
-  	 posX = -1.0f + 0.01f; 
-        }
-    }
+               int colorLoc = GL.GetUniformLocation(_shaderProgram, "uColor");
+               Humans human = new Humans(x, y, ID, alive, transform, transformLoc, color, colorLoc); 
+     
+               listHumans.Add(human);
+               posX += spacing;
+             } 
+            posY -= spacing;
+            posX = -1.0f + 0.01f; 
+          }
+       }
 
     protected override void OnUpdateFrame(FrameEventArgs e)
-    { 
-      base.OnUpdateFrame(e);
-      if (KeyboardState.IsKeyDown(Keys.C))
-      {
-        Close(); 
-      }
-
-    Vector3 colorDead = new Vector3(1.0f, 1.0f, 1.0f);
-    Vector3 colorAlive = new Vector3(0.0f, 0.0f, 0.0f);
-
-    bool[] nextStatus = new bool[listHumans.Count];
-
-    for (int i = 0; i < listHumans.Count; i++)
-    {
-        var human = listHumans[i];
-        int[] counts = human.changeColor(listHumans);
-
-       if (human.status == false && counts[1] == 3){//Nacimiento
-           nextStatus[i] = true;
-	}else if (human.status == true && counts[1] > 3) //Muerte por sobrepoblacion
+     { 
+       base.OnUpdateFrame(e);
+       timer += e.Time;
+       if (KeyboardState.IsKeyDown(Keys.C))
+        {
+          Close(); 
+        }
+       if (timer >= tickRate)
 	{
-           nextStatus[i] = false;
+          Vector3 colorDead = new Vector3(1.0f, 1.0f, 1.0f);
+          Vector3 colorAlive = new Vector3(0.0f, 0.0f, 0.0f);
 
-	}else if (human.status == true && counts[1] < 2)//Muerte por soledad 
- 	{
-            nextStatus[i] = false;
-	}else if (human.status == true && counts[1] > 1 && counts[1] < 4)//Supervivencia
-	{
-           nextStatus[i] = true;
-	}    }
+          bool[] nextStatus = new bool[listHumans.Count];
 
-    for (int i = 0; i < listHumans.Count; i++)
-    {
-        listHumans[i].status = nextStatus[i];
-        listHumans[i].Color = nextStatus[i] ? colorAlive : colorDead;
-    }
+          for (int i = 0; i < listHumans.Count; i++)
+           {
+             var human = listHumans[i];
+             int counts = human.changeColor(listHumans);
 
-    }
+             if (human.status == false && counts == 3)
+              {//Nacimiento
+                nextStatus[i] = true;
+              } else if (human.status == true && counts > 3) 
+              {//Muerte por sobrepoblacion
+                nextStatus[i] = false;
+              } else if (human.status == true && counts < 2)
+              {//Muerte por soledad 
+                nextStatus[i] = false;
+              }else if (human.status == true && counts > 1 && counts < 4)
+              {//Supervivencia
+                nextStatus[i] = true;
+               }    
+            }
+
+           for (int i = 0; i < listHumans.Count; i++)
+            {
+             listHumans[i].status = nextStatus[i];
+             listHumans[i].Color = nextStatus[i] ? colorAlive : colorDead;
+            }
+	 timer = 0.0;
+	}
+     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
-    { 
+     { 
       base.OnRenderFrame(e);
-
       GL.Clear(ClearBufferMask.ColorBufferBit);
 
+      float borderThickness = 0.005f; 
 
-      foreach(var human in listHumans)
-      {
-	var transform = human.Transform;
+      foreach (var human in listHumans)
+       {
+        var borderTransform = Matrix4.CreateScale(
+                0.02f + borderThickness, 
+                0.03f + borderThickness, 
+                1.0f
+            ) *
+            Matrix4.CreateTranslation(
+                -1.0f + 0.01f + human.posX * (0.02f * 1f), 
+                1.0f - 0.015f - human.posY * (0.02f * 1f), 
+                0.0f
+            );
 
-          GL.UniformMatrix4(human.transformLoc, false, ref transform);
-          GL.Uniform3(human.colorLoc, human.Color);
-          GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
-      }
+        var innerTransform = human.Transform;
 
-    SwapBuffers();   
-    }
+        // Dibujar borde
+        GL.UniformMatrix4(human.transformLoc, false, ref borderTransform);
+        GL.Uniform3(human.colorLoc, new Vector3(1.0f, 1.0f, 1.0f)); 
+        GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
+        // Dibujar relleno
+        GL.UniformMatrix4(human.transformLoc, false, ref innerTransform);
+        GL.Uniform3(human.colorLoc, human.Color); 
+        GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+       }
+      SwapBuffers();
+     }
+ 
     protected override void OnUnload()
-    {}
+     {}
 
-    private void configShadders(){
+    private void configShadders()
+     {
 
-      float[] _vertices = {
-            //   X      Y     Z
-            -0.5f, -0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-             0.5f,  0.5f, 0.0f,
-             0.5f,  0.5f, 0.0f,
-            -0.5f,  0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f
+       float[] _vertices =
+        {
+             //   X      Y     Z
+             -0.8f, -0.8f, 0.0f,
+              0.8f, -0.8f, 0.0f,
+              0.8f,  0.8f, 0.0f,
+              0.8f,  0.8f, 0.0f,
+             -0.8f,  0.8f, 0.0f,
+             -0.8f, -0.8f, 0.0f
         };
 
-      _vao = GL.GenVertexArray();
-      GL.BindVertexArray(_vao);
+       _vao = GL.GenVertexArray();
+       GL.BindVertexArray(_vao);
 
-      _vbo = GL.GenBuffer();
-      GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-      GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
+       _vbo = GL.GenBuffer();
+       GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
+       GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
 
-      //Shadears
-      string vertexShaderSrc = @"
-        #version 330 core
-        layout (location = 0) in vec2 aPos;
+       //Shadears
+       string vertexShaderSrc = @"
+         #version 330 core
+         layout (location = 0) in vec2 aPos;
 
-        uniform mat4 transform; 
+         uniform mat4 transform; 
 
-        void main()
+         void main()
+          {
+           gl_Position = transform * vec4(aPos, 0.0, 1.0);
+          }";
+
+         string fragmentShaderSrc = @"
+         #version 330 core
+         out vec4 FragColor;
+          	uniform vec3 uColor;
+         void main()
          {
-          gl_Position = transform * vec4(aPos, 0.0, 1.0);
+             FragColor = vec4(uColor, 1.0); 
+
          }";
 
-        string fragmentShaderSrc = @"
-        #version 330 core
-        out vec4 FragColor;
-         	uniform vec3 uColor;
-        void main()
-        {
-            FragColor = vec4(uColor, 1.0); 
-
-        }";
-
-       int vertexShader = GL.CreateShader(ShaderType.VertexShader);
+        int vertexShader = GL.CreateShader(ShaderType.VertexShader);
         GL.ShaderSource(vertexShader, vertexShaderSrc);
         GL.CompileShader(vertexShader);
 
@@ -191,10 +211,10 @@ namespace MyGame.Core
 
         GL.DeleteShader(vertexShader);
         GL.DeleteShader(fragmentShader);
-      
+       
         GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
         GL.EnableVertexAttribArray(0);
-    }
-}
-}
+     }
+   }
+ }
 
