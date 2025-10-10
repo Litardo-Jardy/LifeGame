@@ -19,6 +19,7 @@ namespace MyGame.Core
      private int _vao;
      private int _vbo;
      private int _shaderProgram;
+     private bool pause = true;
      List<Humans> listHumans = new List<Humans>();
 
      public Window(GameWindowSettings gws, NativeWindowSettings nws)
@@ -29,46 +30,18 @@ namespace MyGame.Core
       { 
         base.OnLoad();
         GL.ClearColor(1.0f, 1.0f, 0.1f, 1.0f);
+
+	Console.WriteLine("Menu de acciones: ");
+	Console.WriteLine("C -> Cierra la ventana");
+	Console.WriteLine("P -> Pausa la simulacion");
+	Console.WriteLine("R -> Reinicia la simulacion");
 	
          //Inicializacion de la matriz;
          configShadders();
          GL.Clear(ClearBufferMask.ColorBufferBit);
          GL.UseProgram(_shaderProgram);
          GL.BindVertexArray(_vao);
-  
-         int transformLoc = GL.GetUniformLocation(_shaderProgram, "transform");
- 
-         float posX = -1.0f + 0.05f; 
-         float posY = 1.0f - 0.015f; 
- 
-         float scaleX = 0.02f;
-         float scaleY = 0.03f; 
-  
-         float spacing = scaleX * 1f;
-  
-         for(int y = 0; y < 100; y++)
-          {
-            for(int x = 0; x < 100; x++)
-             {
-               var transform = Matrix4.CreateScale(scaleX, scaleY, 1.0f) * Matrix4.CreateTranslation(posX, posY, 0.0f);
-     
-               string ID = x.ToString() + y.ToString();
-               Random random = new Random();
-               bool alive = random.NextDouble() < 0.2; 
-
-               Vector3 color = alive 
-                ? new Vector3(0.0f, 0.0f, 0.0f) 
-                : new Vector3(1.0f, 1.0f, 1.0f);
-
-               int colorLoc = GL.GetUniformLocation(_shaderProgram, "uColor");
-               Humans human = new Humans(x, y, ID, alive, transform, transformLoc, color, colorLoc); 
-     
-               listHumans.Add(human);
-               posX += spacing;
-             } 
-            posY -= spacing;
-            posX = -1.0f + 0.01f; 
-          }
+         initGame();
        }
 
     protected override void OnUpdateFrame(FrameEventArgs e)
@@ -78,7 +51,19 @@ namespace MyGame.Core
        if (KeyboardState.IsKeyDown(Keys.C))
         {
           Close(); 
-        }
+        } 
+
+       if (KeyboardState.IsKeyDown(Keys.R))
+        {
+	  initGame();
+        } 
+       
+       if (KeyboardState.IsKeyPressed(Keys.P))
+        {
+	  pause = !pause;
+        } 
+ 
+       if (pause) {
        if (timer >= tickRate)
 	{
           Vector3 colorDead = new Vector3(1.0f, 1.0f, 1.0f);
@@ -113,6 +98,7 @@ namespace MyGame.Core
             }
 	 timer = 0.0;
 	}
+       }
      }
 
     protected override void OnRenderFrame(FrameEventArgs e)
@@ -152,6 +138,44 @@ namespace MyGame.Core
  
     protected override void OnUnload()
      {}
+
+    private void initGame()
+     {
+       listHumans.Clear();
+       int transformLoc = GL.GetUniformLocation(_shaderProgram, "transform");
+ 
+       float posX = -1.0f + 0.05f; 
+       float posY = 1.0f - 0.015f; 
+ 
+       float scaleX = 0.02f;
+       float scaleY = 0.03f; 
+  
+       float spacing = scaleX * 1f;
+  
+       for(int y = 0; y < 100; y++)
+        {
+         for(int x = 0; x < 100; x++)
+          {
+           var transform = Matrix4.CreateScale(scaleX, scaleY, 1.0f) * Matrix4.CreateTranslation(posX, posY, 0.0f);
+     
+           string ID = x.ToString() + y.ToString();
+           Random random = new Random();
+           bool alive = random.NextDouble() < 0.2; 
+
+           Vector3 color = alive 
+           ? new Vector3(0.0f, 0.0f, 0.0f) 
+           : new Vector3(1.0f, 1.0f, 1.0f);
+
+           int colorLoc = GL.GetUniformLocation(_shaderProgram, "uColor");
+           Humans human = new Humans(x, y, ID, alive, transform, transformLoc, color, colorLoc); 
+     
+           listHumans.Add(human);
+             posX += spacing;
+           } 
+            posY -= spacing;
+            posX = -1.0f + 0.01f; 
+         }
+     }
 
     private void configShadders()
      {
