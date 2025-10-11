@@ -1,6 +1,5 @@
 <div align="center" >
-# 🧬 LifeGame 
-*Simulacion del "Juego de la vida" en c# con OpenTK + OpenGL*
+🧬 LifeGame - Simulacion del "Juego de la vida" 
 </div>
 
 ## 🧠 Descripción
